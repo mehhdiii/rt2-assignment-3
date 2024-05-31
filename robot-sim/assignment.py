@@ -87,6 +87,8 @@ def seeObject(R, code):
             return i
 
 def MoveTowardsObject(R, info, movingForDrop=False):
+    time_to_reach_object = time.time()
+
     '''Moves the robot towards the object by self-adjusting pose to grab it'''
     while True:
         print(xr, yr)
@@ -109,6 +111,10 @@ def MoveTowardsObject(R, info, movingForDrop=False):
             # moveStraight(R, 0.1)  
         else:
             moveStraight(R, 0.01)  
+    time_to_reach_object = time.time() - time_to_reach_object
+
+    with open('measurements.txt', 'a+') as file:
+        file.writelines(['time_to_reach_object: ' + str(time_to_reach_object) + '\n'])
 
 
 def getClosestUnivisitedObject(visitedObjects):
@@ -127,13 +133,19 @@ def getClosestUnivisitedObject(visitedObjects):
 
 
 def lookForNextObject(R, visitedObjects):
+    time_to_look_for_object = time.time()
     while True:
         nextObject = getClosestUnivisitedObject(visitedObjects)
         if nextObject !=None: 
+            time_to_look_for_object = time.time() - time_to_look_for_object
+            with open('measurements.txt', 'a+') as file:
+                file.writelines(['time_to_look_for_object: ' + str(time_to_look_for_object) + '\n'])
             return nextObject
         else:
             spinLeft(R, 0.1)
             continue
+
+
 
 R = Robot()
 #STEPS: 
@@ -148,6 +160,12 @@ R = Robot()
 visitedObjects = []
 xgoal, ygoal = 5, 5
 
+with open('measurements.txt', 'a+') as file:
+    file.writelines(['BOXES: ' + str(TOKENS_PER_CIRCLE) + '\n'])
+
+
+total_time = time.time()
+
 while TOKENS_PER_CIRCLE != len(visitedObjects):
     obj = lookForNextObject(R, visitedObjects)
     if obj == None:
@@ -159,12 +177,14 @@ while TOKENS_PER_CIRCLE != len(visitedObjects):
     # place the robot near the last marker:
     if (len(visitedObjects)==0):
         time.sleep(0.1)
-        moveBack(R, 1)
-        spinRight(R, 0.6)
+        # moveBack(R, 1)
+        # spinRight(R, 0.6)
         R.release()
+        moveBack(R, 1)
+
         visitedObjects.append(obj.info)
     else:
-        moveBack(R, 1)
+        moveBack(R, 1.5)
         spinRight(R, 0.6)
         goalObject = visitedObjects[-1]
         
@@ -176,6 +196,9 @@ while TOKENS_PER_CIRCLE != len(visitedObjects):
     # print(R.see())
     # print(xr, yr)
 
+total_time = time.time() - total_time
+with open('measurements.txt', 'a+') as file:
+    file.writelines(['total_time: ' + str(total_time) + '\n\n'])
 
 # #pick and drop first object to the center
 # moveStraight(R, 1.25)
