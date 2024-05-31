@@ -13,7 +13,7 @@ HOME_ZONE_SIZE = 2.5
 
 INNER_CIRCLE_RADIUS = 0.9
 OUTER_CIRCLE_RADIUS = 2.4  # Some tokens are at 1200ish, others at 1270ish
-TOKENS_PER_CIRCLE = 6
+from consts import * 
 PEDESTAL_COLOR = (0x80, 0x80, 0x80)
 
 
